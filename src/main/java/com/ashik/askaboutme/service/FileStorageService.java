@@ -19,5 +19,7 @@ public interface FileStorageService {
             throws InsufficientDataException, IOException, NoSuchAlgorithmException, InvalidKeyException, XmlParserException, InternalException;
     void completeUpload(String objectKey, String uploadId, List<UploadPart> parts)
             throws InsufficientDataException, IOException, NoSuchAlgorithmException, InvalidKeyException, XmlParserException, InternalException;
+    InputStream downloadObject(String objectKey)
+            throws InsufficientDataException, IOException, NoSuchAlgorithmException, InvalidKeyException, XmlParserException, InternalException;
     StorageProvider provider();
 }

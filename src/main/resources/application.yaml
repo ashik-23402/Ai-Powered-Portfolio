@@ -26,6 +26,16 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  sql:
+    init:
+      mode: always
+  task:
+    execution:
+      thread-name-prefix: embedding-exec-
+      pool:
+        core-size: 2
+        max-size: 4
+        queue-capacity: 50
 
 minio:
   url: http://localhost:9000

@@ -71,6 +71,14 @@ public class MinIoFileStorageService implements FileStorageService {
     }
 
     @Override
+    public InputStream downloadObject(String objectKey)
+            throws InsufficientDataException, IOException, NoSuchAlgorithmException, InvalidKeyException, XmlParserException, InternalException {
+        log.info("Downloading object {} from Minio", objectKey);
+        return CompletableFutureBlock.block(minioAsyncClient.getObject(
+                GetObjectArgs.builder().bucket(minIoConfigProperties.bucketName()).object(objectKey).build()));
+    }
+
+    @Override
     public StorageProvider provider() {
         return StorageProvider.MINIO;
     }
