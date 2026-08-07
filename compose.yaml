@@ -1,4 +1,23 @@
 services:
+  ollama:
+    image: 'ollama/ollama:latest'
+    ports:
+      - '11434:11434'
+    volumes:
+      - 'ollama-data:/root/.ollama'
+    restart: 'unless-stopped'
+
+  ollama-init:
+    image: 'ollama/ollama:latest'
+    depends_on:
+      - 'ollama'
+    volumes:
+      - 'ollama-data:/root/.ollama'
+    entrypoint: >
+      /bin/sh -c "
+      until ollama list; do sleep 2; done;
+      ollama pull nomic-embed-text;
+      "
   pgvector:
     image: 'pgvector/pgvector:pg16'
     environment:
@@ -28,3 +47,4 @@ services:
 
 volumes:
   minio-data:
+  ollama-data:

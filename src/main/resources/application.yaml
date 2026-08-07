@@ -5,10 +5,10 @@ spring:
     google:
       genai:
         api-key: REDACTED
-        embedding:
-          api-key: REDACTED
-          text:
-            model: text-embedding-004
+    ollama:
+      base-url: http://localhost:11434
+      embedding:
+        model: nomic-embed-text
     vectorstore:
       pgvector:
         index-type: hnsw
@@ -31,6 +31,7 @@ minio:
   url: http://localhost:9000
   access-key: minioadmin
   secret-key: minioadmind
+  bucket-name: askaboutme
 
 
 
