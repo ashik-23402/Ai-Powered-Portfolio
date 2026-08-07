@@ -9,6 +9,8 @@ services:
 
   ollama-init:
     image: 'ollama/ollama:latest'
+    labels:
+      - "org.springframework.boot.ignore=true"
     depends_on:
       - 'ollama'
     volumes:
@@ -27,7 +29,7 @@ services:
     labels:
       - "org.springframework.boot.service-connection=postgres"
     ports:
-      - '5432'
+      - '5432:5432'
   minio:
     image: 'minio/minio:latest'
     environment:
