@@ -2,9 +2,13 @@ spring:
   application:
     name: askaboutme
   ai:
+    model:
+      chat: google-genai
     google:
       genai:
         api-key: REDACTED
+        chat:
+          model: gemini-flash-latest
     ollama:
       base-url: http://localhost:11434
       embedding:
@@ -13,8 +17,9 @@ spring:
       pgvector:
         index-type: hnsw
         distance-type: cosine_distance
-        dimensions: 1536
+        dimensions: 768
         max-document-batch-size: 5
+        initialize-schema: true
   datasource:
     username: myuser
     password: secret
@@ -40,7 +45,7 @@ spring:
 minio:
   url: http://localhost:9000
   access-key: minioadmin
-  secret-key: minioadmind
+  secret-key: minioadmin
   bucket-name: askaboutme
 
 
