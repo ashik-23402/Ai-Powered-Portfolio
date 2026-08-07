@@ -12,16 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Retrieval-augmented answering: pull the most relevant chunks out of pgvector for the question,
- * then let Gemini answer grounded in that context.
- * <p>
- * The context/question are passed to the model as pre-built {@link SystemMessage}/{@link UserMessage}
- * via {@code ChatClient.prompt().messages(...)} rather than the {@code system(String)}/{@code user(String)}
- * convenience overloads - those run the string through ChatClient's ST4 template renderer, which
- * throws if the text contains literal {@code {}} characters (very likely in text extracted from
- * real documents: JSON, code blocks, tables). Passing Message objects directly skips templating entirely.
- */
 @Slf4j
 @Service
 public class AskService {
@@ -49,7 +39,7 @@ public class AskService {
 
         SystemMessage systemMessage = new SystemMessage("""
                 You are a helpful assistant. Answer the user's question using ONLY the context below,
-                which was retrieved from their uploaded documents. If the answer isn't contained in the
+                which was retrieved from uploaded documents. If the answer isn't contained in the
                 context, say you don't know rather than guessing.
 
                 Context:

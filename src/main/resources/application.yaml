@@ -48,5 +48,16 @@ minio:
   secret-key: minioadmin
   bucket-name: askaboutme
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    disable-swagger-default-url: true
+  show-actuator: false
+
 
 
