@@ -4,6 +4,7 @@
   const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB per part, comfortably under the 25MB server-side multipart limit
   const SESSION_KEY = "askaboutme_admin_session";
   const AUTO_REFRESH_MS = 15000;
+  const DEFAULT_API_BASE = "http://localhost:8080";
 
   /* ============================== state ============================== */
 
@@ -15,6 +16,10 @@
     search: "",
   };
 
+  // Backend URL isn't a login field - it comes from .env's API_BASE (or the default above).
+  // Resolved once during init(), before the login form can be submitted.
+  let configuredApiBase = DEFAULT_API_BASE;
+
   let autoRefreshTimer = null;
 
   /* ============================== dom refs ============================== */
@@ -22,7 +27,6 @@
   const el = {
     loginScreen: document.getElementById("login-screen"),
     loginForm: document.getElementById("login-form"),
-    apiBaseInput: document.getElementById("api-base"),
     usernameInput: document.getElementById("username"),
     passwordInput: document.getElementById("password"),
     loginError: document.getElementById("login-error"),
@@ -126,8 +130,9 @@
   /**
    * Static frontend, no build step - so there's no bundler to inject a real .env at build time.
    * Instead we fetch the plain-text .env file at runtime (same origin as index.html, served
-   * alongside it) and parse simple KEY=VALUE lines. Falls back silently to the blank/default
-   * login form if .env is missing (e.g. a fresh checkout that only has .env.example).
+   * alongside it) and parse simple KEY=VALUE lines to read API_BASE. Falls back silently to
+   * DEFAULT_API_BASE if .env is missing (e.g. a fresh checkout that only has .env.example).
+   * Login credentials are never read from here - the user types them in on every login.
    */
   function parseEnv(text) {
     const result = {};
@@ -209,17 +214,16 @@
     setLoginBusy(true);
     hideLoginError();
 
-    const apiBase = el.apiBaseInput.value.trim().replace(/\/+$/, "");
     const username = el.usernameInput.value.trim();
     const password = el.passwordInput.value;
 
-    if (!apiBase || !username || !password) {
+    if (!username || !password) {
       setLoginBusy(false);
-      showLoginError("All fields are required.");
+      showLoginError("Username and password are required.");
       return;
     }
 
-    startSession({ apiBase, username, password });
+    startSession({ apiBase: configuredApiBase, username, password });
 
     try {
       const files = await api.listFiles();
@@ -539,10 +543,8 @@
 
   (async function init() {
     const env = await loadEnvConfig();
-    if (env) {
-      if (env.API_BASE) el.apiBaseInput.value = env.API_BASE;
-      if (env.ADMIN_USERNAME) el.usernameInput.value = env.ADMIN_USERNAME;
-      if (env.ADMIN_PASSWORD) el.passwordInput.value = env.ADMIN_PASSWORD;
+    if (env && env.API_BASE) {
+      configuredApiBase = env.API_BASE.replace(/\/+$/, "");
     }
 
     if (restoreSession()) {
@@ -559,16 +561,5 @@
     }
 
     showDashboard(false);
-
-    // Auto sign in when .env supplies full credentials, so the form doesn't have to be
-    // submitted by hand on every load. The fields stay pre-filled either way, so a wrong/missing
-    // .env value just leaves the user on the (now pre-filled) login form to fix and submit manually.
-    if (env && env.API_BASE && env.ADMIN_USERNAME && env.ADMIN_PASSWORD) {
-      if (el.loginForm.requestSubmit) {
-        el.loginForm.requestSubmit();
-      } else {
-        el.loginForm.dispatchEvent(new Event("submit", { cancelable: true }));
-      }
-    }
   })();
 })();

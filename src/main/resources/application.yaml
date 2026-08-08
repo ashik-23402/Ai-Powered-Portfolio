@@ -10,7 +10,7 @@ spring:
       chat: google-genai
     google:
       genai:
-        api-key: REDACTED
+        api-key: ${GEMINI_API_KEY :REDACTED}
         chat:
           model: gemini-flash-latest
     ollama:
@@ -25,8 +25,8 @@ spring:
         max-document-batch-size: 5
         initialize-schema: true
   datasource:
-    username: myuser
-    password: secret
+    username: ${POSTGRES_USER:myuser}
+    password: ${POSTGRES_PASSWORD:secret}
     url: jdbc:postgresql://localhost:5432/mydatabase
     driver-class-name: org.postgresql.Driver
   jpa:
@@ -48,8 +48,8 @@ spring:
 
 minio:
   url: http://localhost:9000
-  access-key: minioadmin
-  secret-key: minioadmin
+  access-key: ${MINIO_ROOT_USER:minioadmin}
+  secret-key: ${MINIO_ROOT_PASSWORD:minioadmin}
   bucket-name: askaboutme
 
 app:

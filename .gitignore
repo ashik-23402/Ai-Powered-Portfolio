@@ -38,3 +38,9 @@ out/
 
 ### Admin-Frontend ###
 Admin-Frontend/.env
+
+### Portfolio-web ###
+Portfolio-web/.env
+
+### Backend ###
+/.env
