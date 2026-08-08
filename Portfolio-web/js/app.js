@@ -205,6 +205,18 @@
       tags: ["Spring Boot", "React", "AWS SQS", "CloudWatch", "Nginx"],
     },
     {
+      title: "AskAboutMe — AI-Powered Portfolio",
+      desc: "The retrieval-augmented Q&A system behind this very site: upload documents about yourself, they're chunked and embedded into a vector store, and an /ask endpoint answers natural-language questions about them using Gemini, grounded only in what was uploaded. The \"Ask AI about me\" button above talks to it directly.",
+      highlights: [
+        { q: "Answers need to stay grounded, not hallucinated", a: "Built a RAG pipeline: pgvector similarity search over embedded document chunks, then Gemini answers strictly from the retrieved context - and says it doesn't know rather than guessing." },
+        { q: "Ingesting documents without blocking uploads", a: "Chunked multipart upload lifecycle (initiate / parts / complete) with a scheduled background job that embeds completed files into pgvector within about a minute." },
+        { q: "Protecting a public AI endpoint from abuse", a: "Implemented an in-memory per-IP rate limiter as a servlet filter, returning 429 with a consistent error contract that both frontends translate into a friendly message." },
+        { q: "Reliable cleanup after deletion", a: "Soft-delete plus best-effort cleanup of storage and vector rows, retried by a ShedLock-coordinated scheduled job until it succeeds." },
+      ],
+      tags: ["Spring Boot", "Spring AI", "pgvector", "Gemini", "MinIO", "Docker"],
+      link: "https://github.com/ashik-23402/Ai-Powered-Portfolio",
+    },
+    {
       title: "MedCare",
       desc: "A community healthcare app connecting people to blood donors, ambulance services, AI-driven medical consultations and fundraising support. Owned the entire backend.",
       highlights: [
