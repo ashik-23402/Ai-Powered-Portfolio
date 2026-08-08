@@ -36,6 +36,7 @@ public class FileDeletionProcessingService {
 
         if (vectorStoreCleaned && objectRemoved) {
             fileUploadDeletionStatusService.updateDeletionStatus(fileUpload.getId(), DeletionStatus.COMPLETED);
+            fileUploadDeletionStatusService.deleteFromDeletionStatus(fileUpload.getId());
             log.info("Deletion completed for file {}", fileUpload.getId());
         } else {
             fileUploadDeletionStatusService.updateDeletionStatus(fileUpload.getId(), DeletionStatus.FAILED);

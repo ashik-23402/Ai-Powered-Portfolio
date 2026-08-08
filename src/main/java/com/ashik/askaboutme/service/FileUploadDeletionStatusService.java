@@ -54,4 +54,8 @@ public class FileUploadDeletionStatusService {
             fileUploadRepository.save(fileUpload);
         });
     }
+
+    public void deleteFromDeletionStatus(Long fileId) {
+        fileUploadRepository.deleteById(fileId);
+    }
 }
