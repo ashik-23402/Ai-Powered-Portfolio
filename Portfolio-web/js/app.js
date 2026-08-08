@@ -102,6 +102,11 @@
     infinity: '<path d="M8.5 8a4 4 0 1 0 0 8c2.5 0 4-2.5 7-8a4 4 0 1 1 0 8c-3 0-4.5-5.5-7-8Z"/>',
     terminal: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3M13 15h4"/>',
     workflow: '<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 6h7M18 8.5v7M8.5 7.5 15.5 16"/>',
+    table: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/>',
+    server: '<rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01"/>',
+    network: '<circle cx="12" cy="5" r="2.2"/><circle cx="5" cy="19" r="2.2"/><circle cx="19" cy="19" r="2.2"/><path d="m10.2 6.9-3.4 9.8M13.8 6.9l3.4 9.8M7.2 19h9.6"/>',
+    sparkle: '<path d="M12 3c.6 3.4 2.6 5.4 6 6-3.4.6-5.4 2.6-6 6-.6-3.4-2.6-5.4-6-6 3.4-.6 5.4-2.6 6-6Z"/><path d="M19 15c.2 1.1.9 1.8 2 2-1.1.2-1.8.9-2 2-.2-1.1-.9-1.8-2-2 1.1-.2 1.8-.9 2-2Z"/>',
+    bot: '<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 4h6"/><circle cx="9" cy="14" r="1.3"/><circle cx="15" cy="14" r="1.3"/><path d="M9 18h6"/>',
   };
 
   function iconSvg(key, strokeWidth) {
@@ -116,9 +121,14 @@
   const SKILLS = [
     { name: "Java", icon: "coffee" },
     { name: "Spring Boot", icon: "leaf" },
+    { name: "Spring AI", icon: "sparkle" },
+    { name: "Spring Cloud", icon: "cloud" },
     { name: "Hibernate / JPA", icon: "layers" },
     { name: "MySQL", icon: "database" },
+    { name: "Microservices", icon: "network" },
     { name: "AWS", icon: "cloud" },
+    { name: "AWS EC2", icon: "server" },
+    { name: "AWS DynamoDB", icon: "table" },
     { name: "Amazon SQS", icon: "queue" },
     { name: "Docker", icon: "container" },
     { name: "Git", icon: "gitBranch" },
@@ -126,6 +136,8 @@
     { name: "Spring Security / JWT", icon: "lock" },
     { name: "CloudWatch", icon: "monitor" },
     { name: "CI/CD", icon: "workflow" },
+    { name: "Agentic Development", icon: "bot" },
+    { name: "Claude Code", icon: "terminal" },
   ];
 
   const EXPERIENCE = [
@@ -403,6 +415,16 @@
     chatStatus.textContent = pending ? "Thinking…" : "Answers grounded in his real experience";
   }
 
+  const AI_UNAVAILABLE_MESSAGE = "The AI service is currently unavailable. Please try again after some time.";
+  const RATE_LIMITED_MESSAGE = "You're asking questions a bit fast - please wait a moment and try again.";
+
+  class AskApiError extends Error {
+    constructor(message, status) {
+      super(message);
+      this.status = status;
+    }
+  }
+
   async function askBackend(question) {
     const res = await fetch(`${configuredApiBase}${ASK_ENDPOINT}`, {
       method: "POST",
@@ -411,18 +433,25 @@
     });
 
     if (!res.ok) {
-      let message = `Request failed (${res.status})`;
+      // The backend's raw `message` (validation detail, stack-trace-adjacent text, etc.) is
+      // logged for debugging but never shown to visitors - see friendlyErrorMessage below.
+      let detail = `Request failed (${res.status})`;
       try {
         const body = await res.json();
-        if (body && body.message) message = body.message;
+        if (body && body.message) detail = body.message;
       } catch (_) {
-        /* non-JSON error body, keep default message */
+        /* non-JSON error body, keep default detail */
       }
-      throw new Error(message);
+      throw new AskApiError(detail, res.status);
     }
 
     const data = await res.json();
     return data.answer;
+  }
+
+  function friendlyErrorMessage(err) {
+    if (err instanceof AskApiError && err.status === 429) return RATE_LIMITED_MESSAGE;
+    return AI_UNAVAILABLE_MESSAGE;
   }
 
   async function submitQuestion() {
@@ -439,8 +468,9 @@
       removeTypingIndicator();
       appendBotMessage(answer || "I don't have an answer for that right now.");
     } catch (err) {
+      console.error("Ask AI request failed:", err);
       removeTypingIndicator();
-      appendBotMessage(err.message || "Something went wrong reaching the AI service.", true);
+      appendBotMessage(friendlyErrorMessage(err), true);
       showToast("Couldn't reach the AI assistant", "danger");
     } finally {
       setChatPending(false);

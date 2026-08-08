@@ -37,6 +37,8 @@ public class AskController {
                     content = @Content(schema = @Schema(implementation = AskResponse.class))),
             @ApiResponse(responseCode = "400", description = "Validation failed (blank/missing question)",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "429", description = "Too many requests from this IP - rate limit exceeded",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "The embedding model or Gemini call failed",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })

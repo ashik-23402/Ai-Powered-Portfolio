@@ -10,7 +10,7 @@ spring:
       chat: google-genai
     google:
       genai:
-        api-key: ${GEMINI_API_KEY :REDACTED}
+        api-key: ${GEMINI_API_KEY}
         chat:
           model: gemini-flash-latest
     ollama:
@@ -56,6 +56,10 @@ app:
   security:
     username: ${APP_SECURITY_USERNAME:admin}
     password: ${APP_SECURITY_PASSWORD:change-me}
+  rate-limit:
+    ask:
+      max-requests: 10
+      window: 1m
 
 springdoc:
   api-docs:
