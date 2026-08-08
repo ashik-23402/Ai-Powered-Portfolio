@@ -3,6 +3,7 @@ package com.ashik.askaboutme.service;
 import com.ashik.askaboutme.configdto.StorageProvider;
 import com.ashik.askaboutme.configdto.UploadPart;
 import com.ashik.askaboutme.dto.CompleteUploadRequest;
+import com.ashik.askaboutme.dto.FileDeleteResponse;
 import com.ashik.askaboutme.dto.FileUploadResponse;
 import com.ashik.askaboutme.dto.InitiateUploadRequest;
 import com.ashik.askaboutme.dto.InitiateUploadResponse;
@@ -27,6 +28,8 @@ public class FileUploadService {
 
     private final FileStorageResolver fileStorageResolver;
     private final FileUploadRepository fileUploadRepository;
+    private final FileUploadDeletionStatusService fileUploadDeletionStatusService;
+    private final FileDeletionProcessingService fileDeletionProcessingService;
 
     @Transactional
     public InitiateUploadResponse initiateUpload(InitiateUploadRequest request) {
@@ -100,6 +103,12 @@ public class FileUploadService {
         log.info("Completed upload {} (objectKey={})", fileUpload.getId(), fileUpload.getObjectKey());
 
         return FileUploadResponse.makeFileUploadResponse(fileUpload);
+    }
+
+    public FileDeleteResponse deleteFile(Long fileId) {
+        FileUpload fileUpload = fileUploadDeletionStatusService.requestDeletion(fileId);
+        fileDeletionProcessingService.process(fileUpload);
+        return new FileDeleteResponse(fileUpload.getId(), fileUpload.getDeletionStatus());
     }
 
     private FileUpload getModifiableUpload(Long fileId) {

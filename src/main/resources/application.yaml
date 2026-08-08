@@ -48,6 +48,11 @@ minio:
   secret-key: minioadmin
   bucket-name: askaboutme
 
+app:
+  security:
+    username: ${APP_SECURITY_USERNAME:admin}
+    password: ${APP_SECURITY_PASSWORD:change-me}
+
 springdoc:
   api-docs:
     path: /v3/api-docs

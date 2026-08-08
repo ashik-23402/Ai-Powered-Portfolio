@@ -35,4 +35,7 @@ public class FileUpload {
 
     @Enumerated(EnumType.STRING)
     private EmbeddedStatus embeddedStatus;
+
+    @Enumerated(EnumType.STRING)
+    private DeletionStatus deletionStatus;
 }

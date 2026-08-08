@@ -1,7 +1,9 @@
 package com.ashik.askaboutme.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,9 +13,15 @@ import java.util.List;
 @Configuration
 public class OpenApiConfig {
 
+    public static final String BASIC_AUTH_SCHEME = "basicAuth";
+
     @Bean
     public OpenAPI askAboutMeOpenApi() {
         return new OpenAPI()
+                .components(new Components().addSecuritySchemes(BASIC_AUTH_SCHEME,
+                        new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("basic")))
                 .info(new Info()
                         .title("AskAboutMe API")
                         .version("v1")

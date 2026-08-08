@@ -2,8 +2,11 @@ package com.ashik.askaboutme.service;
 
 import com.ashik.askaboutme.configdto.StorageProvider;
 import com.ashik.askaboutme.configdto.UploadPart;
+import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
+import io.minio.errors.InvalidResponseException;
+import io.minio.errors.ServerException;
 import io.minio.errors.XmlParserException;
 
 import java.io.IOException;
@@ -21,5 +24,10 @@ public interface FileStorageService {
             throws InsufficientDataException, IOException, NoSuchAlgorithmException, InvalidKeyException, XmlParserException, InternalException;
     InputStream downloadObject(String objectKey)
             throws InsufficientDataException, IOException, NoSuchAlgorithmException, InvalidKeyException, XmlParserException, InternalException;
+    void removeObject(String objectKey)
+            throws InsufficientDataException, IOException, NoSuchAlgorithmException, InvalidKeyException, XmlParserException, InternalException;
+    String getPreviewUrl(String objectKey, int expirySeconds)
+            throws InsufficientDataException, IOException, NoSuchAlgorithmException, InvalidKeyException, XmlParserException,
+            InternalException, ErrorResponseException, InvalidResponseException, ServerException;
     StorageProvider provider();
 }

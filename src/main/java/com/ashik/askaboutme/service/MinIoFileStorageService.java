@@ -7,9 +7,13 @@ import com.ashik.askaboutme.utils.CompletableFutureBlock;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import io.minio.*;
+import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
+import io.minio.errors.InvalidResponseException;
+import io.minio.errors.ServerException;
 import io.minio.errors.XmlParserException;
+import io.minio.http.Method;
 import io.minio.messages.Part;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,6 +80,26 @@ public class MinIoFileStorageService implements FileStorageService {
         log.info("Downloading object {} from Minio", objectKey);
         return CompletableFutureBlock.block(minioAsyncClient.getObject(
                 GetObjectArgs.builder().bucket(minIoConfigProperties.bucketName()).object(objectKey).build()));
+    }
+
+    @Override
+    public void removeObject(String objectKey)
+            throws InsufficientDataException, IOException, NoSuchAlgorithmException, InvalidKeyException, XmlParserException, InternalException {
+        log.info("Removing object {} from Minio", objectKey);
+        CompletableFutureBlock.block(minioAsyncClient.removeObject(
+                RemoveObjectArgs.builder().bucket(minIoConfigProperties.bucketName()).object(objectKey).build()));
+    }
+
+    @Override
+    public String getPreviewUrl(String objectKey, int expirySeconds)
+            throws InsufficientDataException, IOException, NoSuchAlgorithmException, InvalidKeyException, XmlParserException,
+            InternalException, ErrorResponseException, InvalidResponseException, ServerException {
+        return minioAsyncClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+                .method(Method.GET)
+                .bucket(minIoConfigProperties.bucketName())
+                .object(objectKey)
+                .expiry(expirySeconds)
+                .build());
     }
 
     @Override
